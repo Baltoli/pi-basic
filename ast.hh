@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 #include "llvm/IR/Value.h"
 
 #include "Compiler.hh"
@@ -17,6 +19,14 @@ struct Literal : public Node {
 
   Literal(int32_t v);
   
+  llvm::Value *compile(Compiler::State *s) override;
+};
+
+struct Variable : public Node {
+  std::string name;
+
+  Variable(std::string n);
+
   llvm::Value *compile(Compiler::State *s) override;
 };
 
