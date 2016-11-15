@@ -2,18 +2,22 @@
 
 #include "llvm/IR/Value.h"
 
-#include "compiler.hh"
+#include "Compiler.hh"
 
-struct ASTNode {
-  virtual llvm::Value *compile(compiler::State *s) = 0;
+namespace AST {
 
-  virtual ~ASTNode() {};
+struct Node {
+  virtual llvm::Value *compile(Compiler::State *s) = 0;
+
+  virtual ~Node() {};
 };
 
-struct Literal : public ASTNode {
+struct Literal : public Node {
   int32_t value;
 
   Literal(int32_t v);
   
-  llvm::Value *compile(compiler::State *s) override;
+  llvm::Value *compile(Compiler::State *s) override;
 };
+
+}

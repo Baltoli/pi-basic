@@ -1,6 +1,6 @@
 #pragma once
 
-namespace compiler {
+namespace Compiler {
 
 struct State {
 };
