@@ -15,7 +15,9 @@ include_directories(${LLVM_INCLUDE_DIRS})
 add_definitions(${LLVM_DEFINITIONS})
 
 # Now build our tools
-add_executable(pib main.cc)
+add_executable(pib main.cc ast.cc)
+
+set(CMAKE_CXX_FLAGS "-std=c++11")
 
 # Find the libraries that correspond to the LLVM components
 # that we wish to use
