@@ -1,7 +1,11 @@
+#pragma once
+
 #include "llvm/IR/Value.h"
 
+#include "compiler.hh"
+
 struct ASTNode {
-  virtual llvm::Value *compile() = 0;
+  virtual llvm::Value *compile(compiler::State *s) = 0;
 
   virtual ~ASTNode() {};
 };
@@ -11,5 +15,5 @@ struct Literal : public ASTNode {
 
   Literal(int32_t v);
   
-  llvm::Value *compile() override;
+  llvm::Value *compile(compiler::State *s) override;
 };
