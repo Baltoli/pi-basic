@@ -15,7 +15,12 @@ include_directories(${LLVM_INCLUDE_DIRS})
 add_definitions(${LLVM_DEFINITIONS})
 
 # Now build our tools
-add_executable(pbc main.cc ast.cc compiler.cc parser.cc)
+add_executable(pbc 
+  src/main.cc 
+  src/ast.cc 
+  src/compiler.cc 
+  src/parser.cc
+)
 
 set(CMAKE_CXX_FLAGS "-std=c++11")
 
