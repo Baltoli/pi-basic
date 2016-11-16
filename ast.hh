@@ -22,6 +22,14 @@ struct Literal : public Node {
   llvm::Value *compile(Compiler::State *s) override;
 };
 
+struct BooleanLiteral : public Node {
+  bool value;
+
+  BooleanLiteral(bool v);
+
+  llvm::Value *compile(Compiler::State *s) override;
+};
+
 struct Variable : public Node {
   std::string name;
 
