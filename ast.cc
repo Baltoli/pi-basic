@@ -22,4 +22,11 @@ Value *Variable::compile(Compiler::State *s) {
   return nullptr;
 }
 
+BinaryOp::BinaryOp(Node *l, OpType t, Node *r) :
+  left(l), type(t), right(r) {}
+
+Value *BinaryOp::compile(Compiler::State *s) {
+  return nullptr;
+}
+
 }

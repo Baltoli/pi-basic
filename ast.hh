@@ -38,4 +38,28 @@ struct Variable : public Node {
   llvm::Value *compile(Compiler::State *s) override;
 };
 
+enum OpType {
+  Add,
+  Subtract,
+  Multiply,
+  Divide,
+  Mod,
+  Eq,
+  Neq,
+  Gt,
+  Lt,
+  GtEq,
+  LtEq
+};
+
+struct BinaryOp : public Node {
+  Node *left;
+  Node *right;
+  OpType type;
+
+  BinaryOp(Node *l, OpType t, Node *r);
+
+  llvm::Value *compile(Compiler::State *s) override;
+};
+
 }
