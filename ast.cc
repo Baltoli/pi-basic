@@ -47,4 +47,10 @@ Value *WhileLoop::compile(Compiler::State *s) {
   return nullptr;
 }
 
+If::If(Node *c, Node *t, Node* f) : condition(c), trueBody(t), falseBody(f) {}
+
+Value *If::compile(Compiler::State *s) {
+  return nullptr;
+}
+
 }

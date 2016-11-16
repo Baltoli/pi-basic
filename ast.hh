@@ -88,4 +88,14 @@ struct WhileLoop : public Node {
   llvm::Value *compile(Compiler::State *s) override;
 };
 
+struct If : public Node {
+  Node *condition;
+  Node *trueBody;
+  Node *falseBody;
+
+  If(Node *c, Node *t, Node *f);
+
+  llvm::Value *compile(Compiler::State *s) override;
+};
+
 }
