@@ -15,7 +15,7 @@ include_directories(${LLVM_INCLUDE_DIRS})
 add_definitions(${LLVM_DEFINITIONS})
 
 # Now build our tools
-add_executable(pib main.cc ast.cc compiler.cc)
+add_executable(pbc main.cc ast.cc compiler.cc parser.cc)
 
 set(CMAKE_CXX_FLAGS "-std=c++11")
 
@@ -24,4 +24,4 @@ set(CMAKE_CXX_FLAGS "-std=c++11")
 llvm_map_components_to_libnames(llvm_libs support core irreader)
 
 # Link against LLVM libraries
-target_link_libraries(pib ${llvm_libs})
+target_link_libraries(pbc ${llvm_libs})
