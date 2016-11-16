@@ -126,4 +126,12 @@ struct FunctionList : public Node {
   llvm::Value *compile(Compiler::State &s) override;
 };
 
+struct StatementList : public Node {
+  std::vector<Node *> statements;
+
+  FunctionList(std::vector<Node *> ss);
+
+  llvm::value *compile(Compiler::State &s) override;
+};
+
 }

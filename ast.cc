@@ -72,4 +72,10 @@ Value *FunctionList::compile(Compiler::State &s) {
   return nullptr;
 }
 
+StatementList::StatementList(std::vector<Node *> ss) : statements(ss) {}
+
+Value *StatementList::compile(Compiler::State &s) {
+  return nullptr;
+}
+
 }
