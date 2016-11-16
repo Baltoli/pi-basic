@@ -59,4 +59,11 @@ Value *Call::compile(Compiler::State &s) {
   return nullptr;
 }
 
+Function::Function(std::string n, std::vector<std::string> p, Node *b) :
+  name(n), params(p), body(b) {}
+
+Value *Function::compile(Compiler::State &s) {
+  return nullptr;
+}
+
 }
