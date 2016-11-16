@@ -108,12 +108,12 @@ struct Call : public Node {
   llvm::Value *compile(Compiler::State &s) override;
 };
 
-struct Function : public Node {
+struct FunctionDecl : public Node {
   std::string name;
   std::vector<std::string> params;
   Node *body;
 
-  Function(std::string n, std::vector<std::string> p, Node *b);
+  FunctionDecl(std::string n, std::vector<std::string> p, Node *b);
 
   llvm::Value *compile(Compiler::State &s) override;
 };
