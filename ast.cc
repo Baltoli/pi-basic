@@ -35,4 +35,10 @@ Value *Deref::compile(Compiler::State *s) {
   return nullptr;
 }
 
+Assign::Assign(std::string n, Node *v) : name(n), value(v) {}
+
+Value *Assign::compile(Compiler::State *s) {
+  return nullptr;
+}
+
 }

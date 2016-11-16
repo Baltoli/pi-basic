@@ -70,4 +70,13 @@ struct Deref : public Node {
   llvm::Value *compile(Compiler::State *s) override;
 };
 
+struct Assign : public Node {
+  std::string name;
+  Node *value;
+
+  Assign(std::string n, Node *v);
+
+  llvm::Value *compile(Compiler::State *s) override;
+};
+
 }
