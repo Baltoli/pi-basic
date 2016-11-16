@@ -78,4 +78,10 @@ Value *StatementList::compile(Compiler::State &s) {
   return nullptr;
 }
 
+Program::Program(Node *fs, Node *b) : functions(fs), body(b) {}
+
+Value *Program::compile(Compiler::State &s) {
+  return nullptr;
+}
+
 }

@@ -129,9 +129,18 @@ struct FunctionList : public Node {
 struct StatementList : public Node {
   std::vector<Node *> statements;
 
-  FunctionList(std::vector<Node *> ss);
+  StatementList(std::vector<Node *> ss);
 
-  llvm::value *compile(Compiler::State &s) override;
+  llvm::Value *compile(Compiler::State &s) override;
+};
+
+struct Program : public Node {
+  Node *functions;
+  Node *body;
+
+  Program(Node *fs, Node *b);
+
+  llvm::Value *compile(Compiler::State &s) override;
 };
 
 }
