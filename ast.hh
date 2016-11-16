@@ -62,4 +62,12 @@ struct BinaryOp : public Node {
   llvm::Value *compile(Compiler::State *s) override;
 };
 
+struct Deref : public Node {
+  Node *address;
+
+  Deref(Node *a);
+
+  llvm::Value *compile(Compiler::State *s) override;
+};
+
 }

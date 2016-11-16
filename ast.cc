@@ -29,4 +29,10 @@ Value *BinaryOp::compile(Compiler::State *s) {
   return nullptr;
 }
 
+Deref::Deref(Node *a) : address(a) {}
+
+Value *Deref::compile(Compiler::State *s) {
+  return nullptr;
+}
+
 }
