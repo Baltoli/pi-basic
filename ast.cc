@@ -53,4 +53,10 @@ Value *If::compile(Compiler::State &s) {
   return nullptr;
 }
 
+Call::Call(std::string n, std::vector<Node *> a) : name(n), args(a) {}
+
+Value *Call::compile(Compiler::State &s) {
+  return nullptr;
+}
+
 }

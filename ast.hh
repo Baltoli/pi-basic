@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <vector>
 
 #include "llvm/IR/Value.h"
 
@@ -94,6 +95,15 @@ struct If : public Node {
   Node *falseBody;
 
   If(Node *c, Node *t, Node *f);
+
+  llvm::Value *compile(Compiler::State &s) override;
+};
+
+struct Call : public Node {
+  std::string name;
+  std::vector<Node *> args;
+
+  Call(std::string n, std::vector<Node *> a);
 
   llvm::Value *compile(Compiler::State &s) override;
 };
