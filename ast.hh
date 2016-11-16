@@ -9,7 +9,7 @@
 namespace AST {
 
 struct Node {
-  virtual llvm::Value *compile(Compiler::State *s) = 0;
+  virtual llvm::Value *compile(Compiler::State &s) = 0;
 
   virtual ~Node() {};
 };
@@ -19,7 +19,7 @@ struct Literal : public Node {
 
   Literal(int32_t v);
   
-  llvm::Value *compile(Compiler::State *s) override;
+  llvm::Value *compile(Compiler::State &s) override;
 };
 
 struct BooleanLiteral : public Node {
@@ -27,7 +27,7 @@ struct BooleanLiteral : public Node {
 
   BooleanLiteral(bool v);
 
-  llvm::Value *compile(Compiler::State *s) override;
+  llvm::Value *compile(Compiler::State &s) override;
 };
 
 struct Variable : public Node {
@@ -35,7 +35,7 @@ struct Variable : public Node {
 
   Variable(std::string n);
 
-  llvm::Value *compile(Compiler::State *s) override;
+  llvm::Value *compile(Compiler::State &s) override;
 };
 
 enum OpType {
@@ -59,7 +59,7 @@ struct BinaryOp : public Node {
 
   BinaryOp(Node *l, OpType t, Node *r);
 
-  llvm::Value *compile(Compiler::State *s) override;
+  llvm::Value *compile(Compiler::State &s) override;
 };
 
 struct Deref : public Node {
@@ -67,7 +67,7 @@ struct Deref : public Node {
 
   Deref(Node *a);
 
-  llvm::Value *compile(Compiler::State *s) override;
+  llvm::Value *compile(Compiler::State &s) override;
 };
 
 struct Assign : public Node {
@@ -76,7 +76,7 @@ struct Assign : public Node {
 
   Assign(std::string n, Node *v);
 
-  llvm::Value *compile(Compiler::State *s) override;
+  llvm::Value *compile(Compiler::State &s) override;
 };
 
 struct WhileLoop : public Node {
@@ -85,7 +85,7 @@ struct WhileLoop : public Node {
 
   WhileLoop(Node *c, Node *b);
 
-  llvm::Value *compile(Compiler::State *s) override;
+  llvm::Value *compile(Compiler::State &s) override;
 };
 
 struct If : public Node {
@@ -95,7 +95,7 @@ struct If : public Node {
 
   If(Node *c, Node *t, Node *f);
 
-  llvm::Value *compile(Compiler::State *s) override;
+  llvm::Value *compile(Compiler::State &s) override;
 };
 
 }
