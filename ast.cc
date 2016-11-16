@@ -6,14 +6,30 @@ namespace AST {
 
 Literal::Literal(int32_t v) : value(v) {}
 
-Value *Literal::compile(Compiler::State *s) {
-  return nullptr;
-}
+BooleanLiteral::BooleanLiteral(bool v) : value(v) {}
 
 Variable::Variable(std::string n) : name(n) {}
 
-Value *Variable::compile(Compiler::State *s) {
-  return nullptr;
-}
+BinaryOp::BinaryOp(Node *l, OpType t, Node *r) :
+  left(l), type(t), right(r) {}
+
+Deref::Deref(Node *a) : address(a) {}
+
+Assign::Assign(std::string n, Node *v) : name(n), value(v) {}
+
+WhileLoop::WhileLoop(Node *c, Node *b) : condition(c), body(b) {}
+
+If::If(Node *c, Node *t, Node* f) : condition(c), trueBody(t), falseBody(f) {}
+
+Call::Call(std::string n, std::vector<Node *> a) : name(n), args(a) {}
+
+FunctionDecl::FunctionDecl(std::string n, std::vector<std::string> p, Node *b) :
+  name(n), params(p), body(b) {}
+
+FunctionList::FunctionList(std::vector<Node *> fs) : functions(fs) {}
+
+StatementList::StatementList(std::vector<Node *> ss) : statements(ss) {}
+
+Program::Program(Node *fs, Node *b) : functions(fs), body(b) {}
 
 }
