@@ -118,4 +118,12 @@ struct Function : public Node {
   llvm::Value *compile(Compiler::State &s) override;
 };
 
+struct FunctionList : public Node {
+  std::vector<Node *> functions;
+
+  FunctionList(std::vector<Node *> fs);
+
+  llvm::Value *compile(Compiler::State &s) override;
+};
+
 }

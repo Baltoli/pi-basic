@@ -66,4 +66,10 @@ Value *Function::compile(Compiler::State &s) {
   return nullptr;
 }
 
+FunctionList::FunctionList(std::vector<Node *> fs) : functions(fs) {}
+
+Value *FunctionList::compile(Compiler::State &s) {
+  return nullptr;
+}
+
 }
