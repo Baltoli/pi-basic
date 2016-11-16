@@ -79,4 +79,13 @@ struct Assign : public Node {
   llvm::Value *compile(Compiler::State *s) override;
 };
 
+struct WhileLoop : public Node {
+  Node *condition;
+  Node *body;
+
+  WhileLoop(Node *c, Node *b);
+
+  llvm::Value *compile(Compiler::State *s) override;
+};
+
 }

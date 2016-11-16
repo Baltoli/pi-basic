@@ -41,4 +41,10 @@ Value *Assign::compile(Compiler::State *s) {
   return nullptr;
 }
 
+WhileLoop::WhileLoop(Node *c, Node *b) : condition(c), body(b) {}
+
+Value *WhileLoop::compile(Compiler::State *s) {
+  return nullptr;
+}
+
 }
