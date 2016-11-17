@@ -17,9 +17,11 @@ struct Parser {
 
   AST::Node *parse();
   AST::Literal *parseLiteral();
+  AST::BooleanLiteral *parseBooleanLiteral();
 private:
   static vector<string> splitLines(string source);
   static string &leftTrim(string &str);
   static string &rightTrim(string &str);
   static bool nonEmpty(char ch);
+  static bool isPrefix(string pre, string::iterator source);
 };

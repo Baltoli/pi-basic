@@ -35,6 +35,18 @@ AST::Literal *Parser::parseLiteral() {
   return nullptr;
 }
 
+AST::BooleanLiteral *Parser::parseBooleanLiteral() {
+  if (isPrefix("true", column)) {
+    column += 4;
+    return new AST::BooleanLiteral(true);
+  } else if (isPrefix("false", column)) {
+    column += 5;
+    return new AST::BooleanLiteral(false);
+  }
+
+  return nullptr;
+}
+
 vector<string> Parser::splitLines(string source) {
   vector<string> ret;
   std::stringstream stream(source);
@@ -64,4 +76,8 @@ string &Parser::rightTrim(string &str) {
 
 bool Parser::nonEmpty(char ch) {
   return !std::isspace<char>(ch , std::locale::classic());
+}
+
+bool Parser::isPrefix(string pre, string::iterator source) {
+  return std::equal(pre.begin(), pre.end(), source);
 }

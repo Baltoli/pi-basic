@@ -65,3 +65,41 @@ TEST_CASE("parser can parse numeric literals", "[parser]") {
     REQUIRE(*(p.column) == 'a');
   }
 }
+
+TEST_CASE("parser can parse boolean literals", "[parser]") {
+  SECTION("parser parses true") {
+    std::string source = "true";
+    Parser p(source);
+    auto lit = p.parseBooleanLiteral();
+
+    REQUIRE(lit != nullptr);
+    REQUIRE(lit->value == true);
+  }
+
+  SECTION("parser parses false") {
+    std::string source = "false";
+    Parser p(source);
+    auto lit = p.parseBooleanLiteral();
+
+    REQUIRE(lit != nullptr);
+    REQUIRE(lit->value == false);
+  }
+
+  SECTION("parser does not parse non-booleans") {
+    std::string source = "notabool123";
+    Parser p(source);
+    auto lit = p.parseBooleanLiteral();
+
+    REQUIRE(lit == nullptr);
+  }
+
+  SECTION("parser parses until it can't") {
+    std::string source = "true1234";
+    Parser p(source);
+    auto lit = p.parseBooleanLiteral();
+
+    REQUIRE(lit != nullptr);
+    REQUIRE(lit->value == true);
+    REQUIRE(*(p.column) == '1');
+  }
+}
