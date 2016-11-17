@@ -19,6 +19,8 @@ struct Parser {
   AST::Literal *parseLiteral();
   AST::BooleanLiteral *parseBooleanLiteral();
 private:
+  void skipWhitespace();
+
   static vector<string> splitLines(string source);
   static string &leftTrim(string &str);
   static string &rightTrim(string &str);

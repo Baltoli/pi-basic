@@ -14,6 +14,8 @@ AST::Node *Parser::parse() {
 }
 
 AST::Literal *Parser::parseLiteral() {
+  skipWhitespace();
+
   auto base = column;
 
   int multiplier = (*column == '-') ? -1 : 1;
@@ -36,6 +38,8 @@ AST::Literal *Parser::parseLiteral() {
 }
 
 AST::BooleanLiteral *Parser::parseBooleanLiteral() {
+  skipWhitespace();
+
   if (isPrefix("true", column)) {
     column += 4;
     return new AST::BooleanLiteral(true);
@@ -45,6 +49,12 @@ AST::BooleanLiteral *Parser::parseBooleanLiteral() {
   }
 
   return nullptr;
+}
+
+void Parser::skipWhitespace() {
+  while(!nonEmpty(*column)) {
+    column++;
+  }
 }
 
 vector<string> Parser::splitLines(string source) {

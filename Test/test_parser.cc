@@ -55,7 +55,7 @@ TEST_CASE("parser can parse numeric literals", "[parser]") {
   }
 
   SECTION("parser parses until it can't") {
-    std::string source = "534abc";
+    std::string source = "   534abc";
     Parser p(source);
     auto it = p.column;
     auto lit = p.parseLiteral();
@@ -94,7 +94,7 @@ TEST_CASE("parser can parse boolean literals", "[parser]") {
   }
 
   SECTION("parser parses until it can't") {
-    std::string source = "true1234";
+    std::string source = "   true1234";
     Parser p(source);
     auto lit = p.parseBooleanLiteral();
 
