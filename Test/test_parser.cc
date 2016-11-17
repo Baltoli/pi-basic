@@ -217,3 +217,142 @@ TEST_CASE("parser can parse operators", "[parser]") {
     REQUIRE(op == AST::Invalid);
   }
 }
+
+TEST_CASE("parser can parse factors", "[parser]") {
+  SECTION("parser can parse a literal factor") {
+    std::string source = "6781";
+    Parser p(source);
+    auto fa = dynamic_cast<AST::Literal *>(p.parseFactor());
+
+    REQUIRE(fa != nullptr);
+    REQUIRE(fa->value == 6781);
+  }
+
+  SECTION("parser can parse a variable factor") {
+    std::string source = "xyz";
+    Parser p(source);
+    auto fa = dynamic_cast<AST::Variable *>(p.parseFactor());
+
+    REQUIRE(fa != nullptr);
+    REQUIRE(fa->name == "xyz");
+  }
+
+  SECTION("parser can parse a parens factor") {
+    std::string source = "( 1 )";
+    Parser p(source);
+    auto fa = dynamic_cast<AST::Literal *>(p.parseFactor());
+
+    REQUIRE(fa != nullptr);
+    REQUIRE(fa->value == 1);
+  }
+
+  SECTION("parser can parse a deref factor") {
+    std::string source = "[ 123 ]";
+    Parser p(source);
+    auto fa = dynamic_cast<AST::Deref *>(p.parseFactor());
+
+    REQUIRE(fa != nullptr);
+    auto address = dynamic_cast<AST::Literal *>(fa->address);
+    REQUIRE(address != nullptr);
+    REQUIRE(address->value == 123);
+  }
+
+  SECTION("parser can parse a call factor") {
+    std::string source = "f(123, b)";
+    Parser p(source);
+    auto fa = dynamic_cast<AST::Call *>(p.parseFactor());
+
+    REQUIRE(fa != nullptr);
+    REQUIRE(fa->name == "f");
+    REQUIRE(fa->args.size() == 2);
+  }
+}
+
+TEST_CASE("parser can parse terms", "[parser]") {
+  SECTION("parser can parse a lone factor term") {
+    std::string source = "-89";
+    Parser p(source);
+    auto te = dynamic_cast<AST::Literal *>(p.parseTerm());
+
+    REQUIRE(te != nullptr);
+    REQUIRE(te->value == -89);
+  }
+
+  SECTION("parser can parse a mul-op term") {
+    std::string source = "34 *   67";
+    Parser p(source);
+    auto te = dynamic_cast<AST::BinaryOp *>(p.parseTerm());
+
+    REQUIRE(te != nullptr);
+    REQUIRE(te->type == AST::Multiply);
+  }
+
+  SECTION("parser won't parse an add-op") {
+    std::string source = "34+67";
+    Parser p(source);
+    auto te = dynamic_cast<AST::Literal *>(p.parseTerm());
+
+    REQUIRE(te != nullptr);
+    REQUIRE(te->value == 34);
+    REQUIRE(*(p.column) == '+');
+  }
+}
+
+TEST_CASE("parser can parse expressions", "[parser]") {
+  SECTION("parser can parse a lone literal expression") {
+    std::string source = "-89";
+    Parser p(source);
+    auto te = dynamic_cast<AST::Literal *>(p.parseExpression());
+
+    REQUIRE(te != nullptr);
+    REQUIRE(te->value == -89);
+  }
+
+  SECTION("parser can parse an add-op term") {
+    std::string source = "34 +   67";
+    Parser p(source);
+    auto te = dynamic_cast<AST::BinaryOp *>(p.parseExpression());
+
+    REQUIRE(te != nullptr);
+    REQUIRE(te->type == AST::Add);
+  }
+
+  SECTION("parser will also parse a mul-op") {
+    std::string source = "34*67";
+    Parser p(source);
+    auto te = dynamic_cast<AST::BinaryOp *>(p.parseExpression());
+
+    REQUIRE(te != nullptr);
+    REQUIRE(te->type == AST::Multiply);
+  }
+}
+
+TEST_CASE("parser can parse a dereference", "[parser]") {
+  SECTION("parser can parse simple deref") {
+    std::string source = "[ 34  ]";
+    Parser p(source);
+    auto de = p.parseDeref();
+    
+    REQUIRE(de != nullptr);
+    auto lit = dynamic_cast<AST::Literal *>(de->address);
+    REQUIRE(lit != nullptr);
+    REQUIRE(lit->value == 34);
+  }
+
+  SECTION("parser sets the cursor correctly") {
+    std::string source = "[ 34  ]a";
+    Parser p(source);
+    auto de = p.parseDeref();
+    
+    REQUIRE(*(p.column) == 'a');
+  }
+
+  SECTION("parser fails if unbalanced") {
+    std::string source = "[ 34";
+    Parser p(source);
+    auto de = p.parseDeref();
+    
+    REQUIRE(de == nullptr);
+    REQUIRE(*(p.column) == '[');
+  }
+}

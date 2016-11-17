@@ -76,10 +76,13 @@ AST::OpType Parser::parseOperator() {
   if(*(column + 1) == '=') {
     switch (*column) {
       case '!':
+        column += 2;
         return AST::Neq;
       case '>':
+        column += 2;
         return AST::GtEq;
       case '<':
+        column += 2;
         return AST::LtEq;
       default:
         return AST::Invalid;
@@ -88,24 +91,141 @@ AST::OpType Parser::parseOperator() {
 
   switch (*column) {
     case '+':
+      column += 1;
       return AST::Add;
     case '-':
+      column += 1;
       return AST::Subtract;
     case '*':
+      column += 1;
       return AST::Multiply;
     case '/':
+      column += 1;
       return AST::Divide;
     case '%':
+      column += 1;
       return AST::Mod;
     case '=':
+      column += 1;
       return AST::Eq;
     case '>':
+      column += 1;
       return AST::Gt;
     case '<':
+      column += 1;
       return AST::Lt;
     default:
       return AST::Invalid;
   }
+}
+
+AST::Node *Parser::parseFactor() {
+  skipWhitespace();
+
+  auto maybeLiteral = parseLiteral();
+  if(maybeLiteral) {
+    return maybeLiteral;
+  }
+
+  auto maybeVariable = parseVariable();
+  if(maybeVariable) {
+    return maybeVariable;
+  }
+
+  auto prev = column;
+  if (*column == '(') {
+    column++;
+    skipWhitespace();
+    auto maybeExpr = parseExpression();
+    skipWhitespace();
+    if(*column == ')' && maybeExpr) {
+      return maybeExpr;
+    } else {
+      column = prev;
+    }
+  }
+
+  auto maybeDeref = parseDeref();
+  if(maybeDeref) {
+    return maybeDeref;
+  }
+
+  auto maybeCall = parseCall();
+  if(maybeCall) {
+    return maybeCall;
+  }
+
+  return nullptr;
+}
+
+AST::Node *Parser::parseTerm() {
+  skipWhitespace();
+
+  auto first = parseFactor();
+  auto prev = column;
+  auto op = parseOperator();
+
+  if(op != AST::Invalid) {
+    auto second = parseFactor();
+    auto opValid = (op == AST::Multiply) || (op == AST::Divide) || (op == AST::Mod);
+
+    if(first && second && opValid) {
+      return new AST::BinaryOp(first, op, second);
+    }
+  }
+
+  column = prev;
+  return first;
+}
+
+AST::Node *Parser::parseExpression() {
+  skipWhitespace();
+
+  auto first = parseTerm();
+  auto prev = column;
+  auto op = parseOperator();
+
+  if(op != AST::Invalid) {
+    auto second = parseTerm();
+    auto opValid = (op == AST::Add) || (op == AST::Subtract);
+
+    if(first && second && opValid) {
+      return new AST::BinaryOp(first, op, second);
+    }
+  }
+
+  column = prev;
+  return first;
+}
+
+AST::Deref *Parser::parseDeref() {
+  auto prev = column;
+  skipWhitespace();
+
+  if(*column != '[') {
+    return nullptr;
+  }
+
+  column++;
+  auto expr = parseExpression();
+  if(!expr) {
+    column = prev;
+    return nullptr;
+  }
+
+  skipWhitespace();
+
+  if(*column != ']') {
+    column = prev;
+    return nullptr;
+  }
+
+  column++;
+  return new AST::Deref(expr);
+}
+
+AST::Call *Parser::parseCall() {
+  return nullptr;
 }
 
 void Parser::skipWhitespace() {

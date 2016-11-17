@@ -76,6 +76,7 @@ single integer to the console.
         factor
       | factor '*' factor
       | factor '/' factor
+      | factor '%' factor
 
     expr ::=
         term

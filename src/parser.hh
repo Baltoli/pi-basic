@@ -20,6 +20,11 @@ struct Parser {
   AST::BooleanLiteral *parseBooleanLiteral();
   AST::Variable *parseVariable();
   AST::OpType parseOperator();
+  AST::Node *parseFactor();
+  AST::Node *parseTerm();
+  AST::Node *parseExpression();
+  AST::Deref *parseDeref();
+  AST::Call *parseCall();
 private:
   void skipWhitespace();
 
