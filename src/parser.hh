@@ -16,6 +16,7 @@ struct Parser {
   Parser(string source);
 
   AST::Node *parse();
+  AST::Literal *parseLiteral();
 private:
   static vector<string> splitLines(string source);
   static string &leftTrim(string &str);

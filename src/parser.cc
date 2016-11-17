@@ -9,7 +9,29 @@ Parser::Parser(std::string source) :
   column(line->begin())
 {}
 
-AST::Node *parse() {
+AST::Node *Parser::parse() {
+  return nullptr;
+}
+
+AST::Literal *Parser::parseLiteral() {
+  auto base = column;
+
+  int multiplier = (*column == '-') ? -1 : 1;
+  if(multiplier == -1) {
+    column++;
+  }
+
+  std::ostringstream stream;
+  while(std::isdigit(*column)) {
+    stream << *column++;
+  }
+
+  string ret = stream.str();
+  if(ret != "") {
+    return new AST::Literal(multiplier * strtol(ret.c_str(), NULL, 10));
+  }
+
+  column = base;
   return nullptr;
 }
 

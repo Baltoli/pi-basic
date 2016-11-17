@@ -24,3 +24,44 @@ TEST_CASE("parser can be initialised properly", "[parser]") {
     REQUIRE(p.column == p.lines[0].begin());
   }
 }
+
+TEST_CASE("parser can parse numeric literals", "[parser]") {
+  SECTION("parser parses simple literals") {
+    std::string source = "432";
+    Parser p(source);
+    auto lit = p.parseLiteral();
+
+    REQUIRE(lit != nullptr);
+    REQUIRE(lit->value == 432);
+  }
+
+  SECTION("parser parses negative numbers") {
+    std::string source = "-2";
+    Parser p(source);
+    auto lit = p.parseLiteral();
+
+    REQUIRE(lit != nullptr);
+    REQUIRE(lit->value == -2);
+  }
+
+  SECTION("parser does not parse non-numerics") {
+    std::string source = "-abcdef";
+    Parser p(source);
+    auto it = p.column;
+    auto lit = p.parseLiteral();
+
+    REQUIRE(lit == nullptr);
+    REQUIRE(p.column == it);
+  }
+
+  SECTION("parser parses until it can't") {
+    std::string source = "534abc";
+    Parser p(source);
+    auto it = p.column;
+    auto lit = p.parseLiteral();
+
+    REQUIRE(lit != nullptr);
+    REQUIRE(lit->value == 534);
+    REQUIRE(*(p.column) == 'a');
+  }
+}
