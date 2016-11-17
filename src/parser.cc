@@ -70,6 +70,44 @@ AST::Variable *Parser::parseVariable() {
   return nullptr;
 }
 
+AST::OpType Parser::parseOperator() {
+  skipWhitespace();
+
+  if(*(column + 1) == '=') {
+    switch (*column) {
+      case '!':
+        return AST::Neq;
+      case '>':
+        return AST::GtEq;
+      case '<':
+        return AST::LtEq;
+      default:
+        return AST::Invalid;
+    }
+  }
+
+  switch (*column) {
+    case '+':
+      return AST::Add;
+    case '-':
+      return AST::Subtract;
+    case '*':
+      return AST::Multiply;
+    case '/':
+      return AST::Divide;
+    case '%':
+      return AST::Mod;
+    case '=':
+      return AST::Eq;
+    case '>':
+      return AST::Gt;
+    case '<':
+      return AST::Lt;
+    default:
+      return AST::Invalid;
+  }
+}
+
 void Parser::skipWhitespace() {
   while(!nonEmpty(*column)) {
     column++;

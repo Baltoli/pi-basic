@@ -50,7 +50,8 @@ enum OpType {
   Gt,
   Lt,
   GtEq,
-  LtEq
+  LtEq,
+  Invalid
 };
 
 struct BinaryOp : public Node {

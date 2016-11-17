@@ -142,3 +142,78 @@ TEST_CASE("parser can parse variable names", "[parser]") {
     REQUIRE(*(p.column) == '?');
   }
 }
+
+TEST_CASE("parser can parse operators", "[parser]") {
+  SECTION("parser parses +") {
+    std::string source = "+";
+    Parser p(source);
+    auto op = p.parseOperator();
+    REQUIRE(op == AST::Add);
+  }
+  SECTION("parser parses -") {
+    std::string source = "-";
+    Parser p(source);
+    auto op = p.parseOperator();
+    REQUIRE(op == AST::Subtract);
+  }
+  SECTION("parser parses *") {
+    std::string source = "*";
+    Parser p(source);
+    auto op = p.parseOperator();
+    REQUIRE(op == AST::Multiply);
+  }
+  SECTION("parser parses /") {
+    std::string source = "/";
+    Parser p(source);
+    auto op = p.parseOperator();
+    REQUIRE(op == AST::Divide);
+  }
+  SECTION("parser parses %") {
+    std::string source = "%";
+    Parser p(source);
+    auto op = p.parseOperator();
+    REQUIRE(op == AST::Mod);
+  }
+  SECTION("parser parses =") {
+    std::string source = "=";
+    Parser p(source);
+    auto op = p.parseOperator();
+    REQUIRE(op == AST::Eq);
+  }
+  SECTION("parser parses !=") {
+    std::string source = "!=";
+    Parser p(source);
+    auto op = p.parseOperator();
+    REQUIRE(op == AST::Neq);
+  }
+  SECTION("parser parses >") {
+    std::string source = ">";
+    Parser p(source);
+    auto op = p.parseOperator();
+    REQUIRE(op == AST::Gt);
+  }
+  SECTION("parser parses <") {
+    std::string source = "<";
+    Parser p(source);
+    auto op = p.parseOperator();
+    REQUIRE(op == AST::Lt);
+  }
+  SECTION("parser parses >=") {
+    std::string source = ">=";
+    Parser p(source);
+    auto op = p.parseOperator();
+    REQUIRE(op == AST::GtEq);
+  }
+  SECTION("parser parses <=") {
+    std::string source = "<=";
+    Parser p(source);
+    auto op = p.parseOperator();
+    REQUIRE(op == AST::LtEq);
+  }
+  SECTION("parser doesn't parse invalid operators") {
+    std::string source = "fiow";
+    Parser p(source);
+    auto op = p.parseOperator();
+    REQUIRE(op == AST::Invalid);
+  }
+}
