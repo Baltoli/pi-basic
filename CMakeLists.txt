@@ -14,12 +14,21 @@ message(STATUS "Using LLVMConfig.cmake in: ${LLVM_DIR}")
 include_directories(${LLVM_INCLUDE_DIRS})
 add_definitions(${LLVM_DEFINITIONS})
 
-# Now build our tools
-add_executable(pbc 
-  src/main.cc 
+include_directories(src)
+
+add_library(Compiler
   src/ast.cc 
   src/compiler.cc 
   src/parser.cc
+)
+
+# Now build our tools
+add_executable(pbc 
+  src/main.cc 
+)
+
+add_executable(unit_tests
+  test/test_main.cc
 )
 
 set(CMAKE_CXX_FLAGS "-std=c++11")
@@ -29,4 +38,8 @@ set(CMAKE_CXX_FLAGS "-std=c++11")
 llvm_map_components_to_libnames(llvm_libs support core irreader)
 
 # Link against LLVM libraries
-target_link_libraries(pbc ${llvm_libs})
+target_link_libraries(pbc ${llvm_libs} Compiler)
+target_link_libraries(unit_tests ${llvm_libs} Compiler)
+
+enable_testing()
+add_subdirectory(Test)
