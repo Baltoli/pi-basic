@@ -1,18 +1,24 @@
 #pragma once
 
 #include <string>
+#include <vector>
 
 #include "ast.hh"
 
-namespace Parser {
+using std::vector;
+using std::string;
 
-/**
- * Top-level parsing function takes a string as a parameter - internally we'll
- * take a reference to the beginning of the string and pass it around as part of
- * a parser state.
- */
-AST::Node *parse(std::string str);
+struct Parser {
+  vector<string> lines;
+  vector<string>::iterator line;
+  string::iterator column;
 
-AST::Node *parseNumericLiteral(std::string::iterator &it);
+  Parser(string source);
 
-}
+  AST::Node *parse();
+private:
+  static vector<string> splitLines(string source);
+  static string &leftTrim(string &str);
+  static string &rightTrim(string &str);
+  static bool nonEmpty(char ch);
+};

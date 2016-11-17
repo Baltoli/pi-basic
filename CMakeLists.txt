@@ -29,6 +29,7 @@ add_executable(pbc
 
 add_executable(unit_tests
   test/test_main.cc
+  test/test_parser.cc
 )
 
 set(CMAKE_CXX_FLAGS "-std=c++11")
