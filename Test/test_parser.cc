@@ -103,3 +103,42 @@ TEST_CASE("parser can parse boolean literals", "[parser]") {
     REQUIRE(*(p.column) == '1');
   }
 }
+
+TEST_CASE("parser can parse variable names", "[parser]") {
+  SECTION("parser parses simple name") {
+    std::string source = "variable";
+    Parser p(source);
+    auto var = p.parseVariable();
+    
+    REQUIRE(var != nullptr);
+    REQUIRE(var->name == "variable");
+  }
+
+  SECTION("parser parses name with underscores") {
+    std::string source = "_some_variable_name";
+    Parser p(source);
+    auto var = p.parseVariable();
+    
+    REQUIRE(var != nullptr);
+    REQUIRE(var->name == "_some_variable_name");
+  }
+
+  SECTION("parser stops at invalid characters") {
+    std::string source = "   variable-name";
+    Parser p(source);
+    auto var = p.parseVariable();
+    
+    REQUIRE(var != nullptr);
+    REQUIRE(var->name == "variable");
+    REQUIRE(*(p.column) == '-');
+  }
+
+  SECTION("parser fails if starting with invalid character", "[parser]") {
+    std::string source = "?-?variable-name";
+    Parser p(source);
+    auto var = p.parseVariable();
+
+    REQUIRE(var == nullptr);
+    REQUIRE(*(p.column) == '?');
+  }
+}

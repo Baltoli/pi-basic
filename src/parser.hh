@@ -18,6 +18,7 @@ struct Parser {
   AST::Node *parse();
   AST::Literal *parseLiteral();
   AST::BooleanLiteral *parseBooleanLiteral();
+  AST::Variable *parseVariable();
 private:
   void skipWhitespace();
 

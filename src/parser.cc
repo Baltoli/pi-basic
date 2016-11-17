@@ -51,6 +51,25 @@ AST::BooleanLiteral *Parser::parseBooleanLiteral() {
   return nullptr;
 }
 
+AST::Variable *Parser::parseVariable() {
+  skipWhitespace();
+
+  if(!(std::isalpha(*column) || *column == '_')) {
+    return nullptr;
+  }
+
+  std::ostringstream stream;
+  while(std::isalnum(*column) || *column == '_') {
+    stream << *column++;
+  }
+
+  if (stream.str() != "") {
+    return new AST::Variable(stream.str());
+  }
+
+  return nullptr;
+}
+
 void Parser::skipWhitespace() {
   while(!nonEmpty(*column)) {
     column++;
