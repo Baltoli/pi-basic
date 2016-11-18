@@ -356,3 +356,13 @@ TEST_CASE("parser can parse a dereference", "[parser]") {
     REQUIRE(*(p.column) == '[');
   }
 }
+
+TEST_CASE("parser can parse expression lists", "[parser]") {
+  SECTION("parser can parse an empty expression list") {
+    std::string source = "";
+    Parser p(source);
+    auto list = p.parseExpressionList();
+
+    REQUIRE(list.size() == 0);
+  }
+}

@@ -25,6 +25,7 @@ struct Parser {
   AST::Node *parseExpression();
   AST::Deref *parseDeref();
   AST::Call *parseCall();
+  vector<AST::Node *> parseExpressionList();
 private:
   void skipWhitespace();
 

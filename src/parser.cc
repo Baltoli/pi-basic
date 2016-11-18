@@ -3,11 +3,16 @@
 
 #include "parser.hh"
 
-Parser::Parser(std::string source) :
-  lines(splitLines(source)),
-  line(lines.begin()),
-  column(line->begin())
-{}
+Parser::Parser(std::string source) {
+  lines = splitLines(source);
+  if(lines.size() > 0) {
+    line = lines.begin();
+    column = line->begin();
+  } else {
+    line = lines.end();
+    column = string("").end();
+  }
+}
 
 AST::Node *Parser::parse() {
   return nullptr;
@@ -226,6 +231,11 @@ AST::Deref *Parser::parseDeref() {
 
 AST::Call *Parser::parseCall() {
   return nullptr;
+}
+
+vector<AST::Node *> Parser::parseExpressionList() {
+  vector<AST::Node *> vec;
+  return vec;
 }
 
 void Parser::skipWhitespace() {
