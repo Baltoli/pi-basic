@@ -9,8 +9,10 @@ Parser::Parser(std::string source) {
     line = lines.begin();
     column = line->begin();
   } else {
-    line = lines.end();
-    column = string("").end();
+    // FIXME: better handling of errors in the constructor. Throwing here is a
+    // hack and should be fixed in the future - though we probably do want to
+    // throw *something* if initialising with an empty string.
+    throw;
   }
 }
 
@@ -280,6 +282,10 @@ vector<AST::Node *> Parser::parseExpressionList() {
   }
 
   return vec;
+}
+
+AST::BinaryOp *Parser::parseComparison() {
+  return nullptr;
 }
 
 void Parser::skipWhitespace() {

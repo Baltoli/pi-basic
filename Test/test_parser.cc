@@ -1,4 +1,5 @@
 #include <string>
+#include <iostream>
 
 #include "parser.hh"
 #include "catch.hh"
@@ -359,8 +360,9 @@ TEST_CASE("parser can parse a dereference", "[parser]") {
 
 TEST_CASE("parser can parse expression lists", "[parser]") {
   SECTION("parser can parse an empty expression list") {
-    std::string source = "";
+    std::string source = "a";
     Parser p(source);
+    auto v = p.parseVariable();
     auto list = p.parseExpressionList();
 
     REQUIRE(list.size() == 0);
@@ -427,5 +429,27 @@ TEST_CASE("parser can parse function calls", "[parser]") {
 
     REQUIRE(call == nullptr);
     REQUIRE(*(p.column) == 'b');
+  }
+}
+
+TEST_CASE("parser can parse comparisons", "[parser]") {
+  SECTION("parser can parse =") {
+    std::string source = "name = 13";
+    Parser p(source);
+    auto co = p.parseComparison();
+
+    REQUIRE(co != nullptr);
+    auto left = dynamic_cast<AST::Variable *>(co->left);
+    auto type = co->type;
+    auto right = dynamic_cast<AST::Literal *>(co->right);
+    REQUIRE(left->name == "name");
+    REQUIRE(type == AST::Eq);
+    REQUIRE(right->value == 13);
+  }
+
+  SECTION("parser can parse !=") {
+  }
+
+  SECTION("parser won't try to do arithmetic") {
   }
 }
