@@ -395,6 +395,35 @@ AST::Node *Parser::parseBoolean() {
   return first;
 }
 
+AST::Assign *Parser::parseAssign() {
+  auto prev = column;
+  skipWhitespace();
+
+  auto maybeVar = parseVariable();
+  if(maybeVar == nullptr) {
+    column = prev;
+    return nullptr;
+  }
+
+  skipWhitespace();
+
+  if(!isPrefix("<-", column)) {
+    column = prev;
+    return nullptr;
+  }
+
+  column += 2;
+  skipWhitespace();
+
+  auto maybeExpr = parseExpression();
+  if(maybeExpr) {
+    return new AST::Assign(maybeVar->name, maybeExpr);
+  }
+
+  column = prev;
+  return nullptr;
+}
+
 void Parser::skipWhitespace() {
   while(!nonEmpty(*column)) {
     column++;

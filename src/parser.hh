@@ -31,6 +31,7 @@ struct Parser {
   AST::Node *parseBooleanFactor();
   AST::Node *parseBooleanTerm();
   AST::Node *parseBoolean();
+  AST::Assign *parseAssign();
 private:
   void skipWhitespace();
 

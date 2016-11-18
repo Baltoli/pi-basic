@@ -593,3 +593,17 @@ TEST_CASE("parser can parse booleans", "[parser]") {
     REQUIRE(te->type == AST::Or);
   }
 }
+
+TEST_CASE("parser can parse assignment", "[parser]") {
+  SECTION("parser can parse simple assignment") {
+    std::string source = "x <- 34";
+    Parser p(source);
+    auto as = p.parseAssign();
+
+    REQUIRE(as != nullptr);
+    REQUIRE(as->name == "x");
+    auto value = dynamic_cast<AST::Literal *>(as->value);
+    REQUIRE(value != nullptr);
+    REQUIRE(value->value == 34);
+  }
+}
