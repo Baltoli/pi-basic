@@ -127,6 +127,11 @@ AST::OpType Parser::parseOperator() {
 AST::Node *Parser::parseFactor() {
   skipWhitespace();
 
+  auto maybeCall = parseCall();
+  if(maybeCall) {
+    return maybeCall;
+  }
+
   auto maybeLiteral = parseLiteral();
   if(maybeLiteral) {
     return maybeLiteral;
@@ -153,11 +158,6 @@ AST::Node *Parser::parseFactor() {
   auto maybeDeref = parseDeref();
   if(maybeDeref) {
     return maybeDeref;
-  }
-
-  auto maybeCall = parseCall();
-  if(maybeCall) {
-    return maybeCall;
   }
 
   return nullptr;
@@ -230,7 +230,28 @@ AST::Deref *Parser::parseDeref() {
 }
 
 AST::Call *Parser::parseCall() {
-  return nullptr;
+  auto prev = column;
+
+  AST::Variable *maybeV = parseVariable();
+  if(maybeV == nullptr) {
+    return nullptr;
+  }
+
+  if(*column != '(') {
+    column = prev;
+    return nullptr;
+  }
+
+  column++;
+  auto exprs = parseExpressionList();
+  skipWhitespace();
+
+  if(*column != ')') {
+    column = prev;
+    return nullptr;
+  }
+
+  return new AST::Call(maybeV->name, exprs);
 }
 
 vector<AST::Node *> Parser::parseExpressionList() {

@@ -394,3 +394,38 @@ TEST_CASE("parser can parse expression lists", "[parser]") {
     REQUIRE(*(p.column) == ',');
   }
 }
+
+TEST_CASE("parser can parse function calls", "[parser]") {
+  SECTION("parser can parse 0-args") {
+    std::string source = "func()";
+    Parser p(source);
+    auto call = p.parseCall();
+
+    REQUIRE(call != nullptr);
+    REQUIRE(call->name == "func");
+    REQUIRE(call->args.size() == 0);
+  }
+
+  SECTION("parser can parse some args") {
+    std::string source = "__name__(x, 2)";
+    Parser p(source);
+    auto call = p.parseCall();
+
+    REQUIRE(call != nullptr);
+    REQUIRE(call->name == "__name__");
+    REQUIRE(call->args.size() == 2);
+    auto first = dynamic_cast<AST::Variable *>(call->args[0]);
+    auto second = dynamic_cast<AST::Literal *>(call->args[1]);
+    REQUIRE(first->name == "x");
+    REQUIRE(second->value == 2);
+  }
+
+  SECTION("parser won't parse incomplete") {
+    std::string source = "broken(";
+    Parser p(source);
+    auto call = p.parseCall();
+
+    REQUIRE(call == nullptr);
+    REQUIRE(*(p.column) == 'b');
+  }
+}
