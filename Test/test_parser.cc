@@ -365,4 +365,32 @@ TEST_CASE("parser can parse expression lists", "[parser]") {
 
     REQUIRE(list.size() == 0);
   }
+
+  SECTION("parser can parse multiple expressions") {
+    std::string source = "1,  3+4,  9";
+    Parser p(source);
+    auto list = p.parseExpressionList();
+
+    REQUIRE(list.size() == 3);
+    auto first = dynamic_cast<AST::Literal *>(list[0]);
+    auto second = dynamic_cast<AST::BinaryOp *>(list[1]);
+    auto third = dynamic_cast<AST::Literal *>(list[2]);
+    REQUIRE(first != nullptr);
+    REQUIRE(second != nullptr);
+    REQUIRE(third != nullptr);
+    REQUIRE(first->value == 1);
+    REQUIRE(second->type == AST::Add);
+    REQUIRE(third->value == 9);
+  }
+
+  SECTION("parser stops when there are no more expressions") {
+    std::string source = "1,";
+    Parser p(source);
+    auto list = p.parseExpressionList();
+
+    REQUIRE(list.size() == 1);
+    auto first = dynamic_cast<AST::Literal *>(list[0]);
+    REQUIRE(first->value == 1);
+    REQUIRE(*(p.column) == ',');
+  }
 }

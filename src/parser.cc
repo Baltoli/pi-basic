@@ -235,6 +235,29 @@ AST::Call *Parser::parseCall() {
 
 vector<AST::Node *> Parser::parseExpressionList() {
   vector<AST::Node *> vec;
+  AST::Node *expr;
+
+  bool comma = false;
+  while(true) {
+    expr = parseExpression();
+    if(expr != nullptr) {
+      vec.push_back(expr);
+    } else if(comma) {
+      column--;
+      break;
+    }
+
+    comma = false;
+    skipWhitespace();
+
+    if(*column == ',') {
+      comma = true;
+      column++;
+    } else {
+      break;
+    }
+  }
+
   return vec;
 }
 
