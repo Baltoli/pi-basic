@@ -76,26 +76,31 @@ single integer to the console.
         factor
       | factor '*' factor
       | factor '/' factor
-      | factor '%' factor
 
     expr ::=
         term
       | term '+' term
       | term '-' term
 
-    bool ::=
-        true
-      | false
+    comp ::=
       | expr '=' expr
       | expr '/=' expr
       | expr '>' expr
       | expr '<' expr
       | expr '>=' expr
       | expr '<=' expr
-      | bool 'and' bool
+
+    boolf ::=
+        true
+      | false
+      | comp
       | bool 'or' bool
       | 'not' bool
       | '(' bool ')'
+
+    bool ::=
+      | boolf
+      | boolf 'and' boolf
 
     statement ::=
         variable '<-' expr
