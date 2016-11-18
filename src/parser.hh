@@ -19,7 +19,7 @@ struct Parser {
   AST::Literal *parseLiteral();
   AST::BooleanLiteral *parseBooleanLiteral();
   AST::Variable *parseVariable();
-  AST::OpType parseOperator();
+  AST::BinaryOpType parseOperator();
   AST::Node *parseFactor();
   AST::Node *parseTerm();
   AST::Node *parseExpression();
@@ -27,6 +27,10 @@ struct Parser {
   AST::Call *parseCall();
   vector<AST::Node *> parseExpressionList();
   AST::BinaryOp *parseComparison();
+  AST::UnaryOpType parseUnaryOperator();
+  AST::Node *parseBooleanFactor();
+  AST::Node *parseBooleanTerm();
+  AST::Node *parseBoolean();
 private:
   void skipWhitespace();
 

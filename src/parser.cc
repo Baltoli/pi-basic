@@ -77,7 +77,7 @@ AST::Variable *Parser::parseVariable() {
   return nullptr;
 }
 
-AST::OpType Parser::parseOperator() {
+AST::BinaryOpType Parser::parseOperator() {
   skipWhitespace();
 
   if(*(column + 1) == '=') {
@@ -122,8 +122,26 @@ AST::OpType Parser::parseOperator() {
       column += 1;
       return AST::Lt;
     default:
+      if(isPrefix("and", column)) {
+        column += 3;
+        return AST::And;
+      } else if(isPrefix("or", column)) {
+        column += 2;
+        return AST::Or;
+      }
       return AST::Invalid;
   }
+}
+
+AST::UnaryOpType Parser::parseUnaryOperator() {
+  skipWhitespace();
+
+  if (isPrefix("not", column)) {
+    column += 3;
+    return AST::Not;
+  }
+
+  return AST::UnaryInvalid;
 }
 
 AST::Node *Parser::parseFactor() {
@@ -285,7 +303,96 @@ vector<AST::Node *> Parser::parseExpressionList() {
 }
 
 AST::BinaryOp *Parser::parseComparison() {
+  auto prev = column;
+
+  auto left = parseExpression();
+  auto op = parseOperator();
+  auto right = parseExpression();
+
+  bool validOp = 
+    (op == AST::Eq) || (op == AST::Neq) ||
+    (op == AST::Lt) || (op == AST::Gt) ||
+    (op == AST::LtEq) || (op == AST::GtEq);
+
+  if(left && right && validOp) {
+    return new AST::BinaryOp(left, op, right);
+  }
+
+  column = prev;
   return nullptr;
+}
+
+AST::Node *Parser::parseBooleanFactor() {
+  auto maybeCompare = parseComparison();
+  if(maybeCompare) {
+    return maybeCompare;
+  }
+
+  auto maybeLiteral = parseBooleanLiteral();
+  if(maybeLiteral) {
+    return maybeLiteral;
+  }
+
+  auto prev = column;
+  if (*column == '(') {
+    column++;
+    skipWhitespace();
+    auto maybeExpr = parseBoolean();
+    skipWhitespace();
+    if(*column == ')' && maybeExpr) {
+      return maybeExpr;
+    } else {
+      column = prev;
+    }
+  }
+
+  auto op = parseUnaryOperator();
+  auto maybeBool = parseBoolean();
+  if(op != AST::UnaryInvalid && maybeBool) {
+    return new AST::UnaryOp(op, maybeBool);
+  }
+
+  return nullptr;
+}
+
+AST::Node *Parser::parseBooleanTerm() {
+  skipWhitespace();
+
+  auto first = parseBooleanFactor();
+  auto prev = column;
+  auto op = parseOperator();
+
+  if(op != AST::Invalid) {
+    auto second = parseBooleanFactor();
+    auto opValid = (op == AST::And);
+
+    if(first && second && opValid) {
+      return new AST::BinaryOp(first, op, second);
+    }
+  }
+
+  column = prev;
+  return first;
+}
+
+AST::Node *Parser::parseBoolean() {
+  skipWhitespace();
+
+  auto first = parseBooleanTerm();
+  auto prev = column;
+  auto op = parseOperator();
+
+  if(op != AST::Invalid) {
+    auto second = parseBooleanTerm();
+    auto opValid = (op == AST::Or);
+
+    if(first && second && opValid) {
+      return new AST::BinaryOp(first, op, second);
+    }
+  }
+
+  column = prev;
+  return first;
 }
 
 void Parser::skipWhitespace() {

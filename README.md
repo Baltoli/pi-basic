@@ -94,13 +94,16 @@ single integer to the console.
         true
       | false
       | comp
-      | bool 'or' bool
-      | 'not' bool
       | '(' bool ')'
+      | 'not' bool
 
-    bool ::=
+    boolt ::=
       | boolf
       | boolf 'and' boolf
+
+    bool ::=
+      | boolt
+      | boolt 'or' boolt
 
     statement ::=
         variable '<-' expr

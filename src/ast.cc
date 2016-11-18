@@ -10,8 +10,11 @@ BooleanLiteral::BooleanLiteral(bool v) : value(v) {}
 
 Variable::Variable(std::string n) : name(n) {}
 
-BinaryOp::BinaryOp(Node *l, OpType t, Node *r) :
+BinaryOp::BinaryOp(Node *l, BinaryOpType t, Node *r) :
   left(l), type(t), right(r) {}
+
+UnaryOp::UnaryOp(UnaryOpType t, Node *op) :
+  type(t), operand(op) {}
 
 Deref::Deref(Node *a) : address(a) {}
 

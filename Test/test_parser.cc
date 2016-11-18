@@ -211,11 +211,39 @@ TEST_CASE("parser can parse operators", "[parser]") {
     auto op = p.parseOperator();
     REQUIRE(op == AST::LtEq);
   }
+  SECTION("parser parses and") {
+    std::string source = "and";
+    Parser p(source);
+    auto op = p.parseOperator();
+    REQUIRE(op == AST::And);
+  }
+  SECTION("parser parses or") {
+    std::string source = "or";
+    Parser p(source);
+    auto op = p.parseOperator();
+    REQUIRE(op == AST::Or);
+  }
   SECTION("parser doesn't parse invalid operators") {
     std::string source = "fiow";
     Parser p(source);
     auto op = p.parseOperator();
     REQUIRE(op == AST::Invalid);
+  }
+}
+
+TEST_CASE("parser can parse unary operators", "[parser]") {
+  SECTION("parser parses not") {
+    std::string source = "not";
+    Parser p(source);
+    auto op = p.parseUnaryOperator();
+    REQUIRE(op == AST::Not);
+  }
+
+  SECTION("parser won't parse anything else") {
+    std::string source = "pweofj";
+    Parser p(source);
+    auto op = p.parseUnaryOperator();
+    REQUIRE(op == AST::UnaryInvalid);
   }
 }
 
@@ -448,8 +476,120 @@ TEST_CASE("parser can parse comparisons", "[parser]") {
   }
 
   SECTION("parser can parse !=") {
+    std::string source = "name != 13";
+    Parser p(source);
+    auto co = p.parseComparison();
+
+    REQUIRE(co != nullptr);
+    auto left = dynamic_cast<AST::Variable *>(co->left);
+    auto type = co->type;
+    auto right = dynamic_cast<AST::Literal *>(co->right);
+    REQUIRE(left->name == "name");
+    REQUIRE(type == AST::Neq);
+    REQUIRE(right->value == 13);
   }
 
   SECTION("parser won't try to do arithmetic") {
+    std::string source = "name + 13";
+    Parser p(source);
+    auto co = p.parseComparison();
+
+    REQUIRE(co == nullptr);
+  }
+}
+
+TEST_CASE("parser can parse boolean factors", "[parser]") {
+  SECTION("parser can parse literal factors") {
+    std::string source = "true";
+    Parser p(source);
+    auto fa = dynamic_cast<AST::BooleanLiteral *>(p.parseBooleanFactor());
+
+    REQUIRE(fa != nullptr);
+    REQUIRE(fa->value == true);
+  }
+
+  SECTION("parser can parse comparison factors") {
+    std::string source = "3 = 4";
+    Parser p(source);
+    auto fa = dynamic_cast<AST::BinaryOp *>(p.parseBooleanFactor());
+
+    REQUIRE(fa != nullptr);
+    auto left = dynamic_cast<AST::Literal *>(fa->left);
+    auto right = dynamic_cast<AST::Literal *>(fa->right);
+    REQUIRE(left->value == 3);
+    REQUIRE(right->value == 4);
+  }
+
+  SECTION("parser can parse parens factors") {
+    std::string source = "( false  )";
+    Parser p(source);
+    auto fa = dynamic_cast<AST::BooleanLiteral *>(p.parseBooleanFactor());
+    
+    REQUIRE(fa != nullptr);
+    REQUIRE(fa->value == false);
+  }
+
+  SECTION("parser can parse negated factors") {
+    std::string source = "not false";
+    Parser p(source);
+    auto fa = dynamic_cast<AST::UnaryOp *>(p.parseBooleanFactor());
+    
+    REQUIRE(fa != nullptr);
+    auto op = dynamic_cast<AST::BooleanLiteral *>(fa->operand);
+    REQUIRE(op != nullptr);
+    REQUIRE(op->value == false);
+    REQUIRE(fa->type == AST::Not);
+  }
+}
+
+TEST_CASE("parser can parse boolean terms", "[parser]") {
+  SECTION("parser can parse a factor term") {
+    std::string source = "true";
+    Parser p(source);
+    auto fa = dynamic_cast<AST::BooleanLiteral *>(p.parseBooleanTerm());
+
+    REQUIRE(fa != nullptr);
+    REQUIRE(fa->value == true);
+  }
+
+  SECTION("parse can parse an and term") {
+    std::string source = "true and false";
+    Parser p(source);
+    auto te = dynamic_cast<AST::BinaryOp *>(p.parseBooleanTerm());
+
+    REQUIRE(te != nullptr);
+    auto left = dynamic_cast<AST::BooleanLiteral *>(te->left);
+    auto right = dynamic_cast<AST::BooleanLiteral *>(te->right);
+    REQUIRE(left != nullptr);
+    REQUIRE(right != nullptr);
+    REQUIRE(left->value == true);
+    REQUIRE(right->value == false);
+    REQUIRE(te->type == AST::And);
+  }
+}
+
+TEST_CASE("parser can parse booleans", "[parser]") {
+  SECTION("parser can parse a term boolean") {
+    std::string source = "true";
+    Parser p(source);
+    auto fa = dynamic_cast<AST::BooleanLiteral *>(p.parseBoolean());
+
+    REQUIRE(fa != nullptr);
+    REQUIRE(fa->value == true);
+  }
+
+  SECTION("parser can parse an or boolean") {
+    std::string source = "true or false";
+    Parser p(source);
+    auto te = dynamic_cast<AST::BinaryOp *>(p.parseBoolean());
+
+    REQUIRE(te != nullptr);
+    auto left = dynamic_cast<AST::BooleanLiteral *>(te->left);
+    auto right = dynamic_cast<AST::BooleanLiteral *>(te->right);
+    REQUIRE(left != nullptr);
+    REQUIRE(right != nullptr);
+    REQUIRE(left->value == true);
+    REQUIRE(right->value == false);
+    REQUIRE(te->type == AST::Or);
   }
 }

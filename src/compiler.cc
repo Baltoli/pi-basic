@@ -21,6 +21,10 @@ Value *BinaryOp::compile(State &s) {
   return nullptr;
 }
 
+Value *UnaryOp::compile(State &s) {
+  return nullptr;
+}
+
 Value *Deref::compile(State &s) {
   return nullptr;
 }
