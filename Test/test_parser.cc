@@ -607,3 +607,91 @@ TEST_CASE("parser can parse assignment", "[parser]") {
     REQUIRE(value->value == 34);
   }
 }
+
+TEST_CASE("parser can parse statements", "[parser]") {
+  SECTION("parser can parse assign statements") {
+    std::string source = "ys <- 67";
+    Parser p(source);
+    auto as = dynamic_cast<AST::Assign *>(p.parseStatement());
+
+    REQUIRE(as != nullptr);
+    REQUIRE(as->name == "ys");
+    auto val = dynamic_cast<AST::Literal *>(as->value);
+    REQUIRE(val->value == 67);
+  }
+
+  SECTION("parser can parse if-end statements") {
+    std::string source = R"(
+      if true
+        g <- 7
+      end
+    )";
+    Parser p(source);
+    auto as = dynamic_cast<AST::If *>(p.parseStatement());
+
+    REQUIRE(as != nullptr);
+    auto list = dynamic_cast<AST::StatementList *>(as->trueBody);
+    REQUIRE(list != nullptr);
+    REQUIRE(list->statements.size() == 1);
+    REQUIRE(as->falseBody == nullptr);
+  }
+
+  SECTION("parser can parse if-else statements") {
+    std::string source = R"(
+      if true
+        z <- 3
+      else
+        y <- 9
+        y <- 9
+        if x > y
+          d <- 89
+        end
+      end
+    )";
+    Parser p(source);
+    auto as = dynamic_cast<AST::If *>(p.parseStatement());
+
+    REQUIRE(as != nullptr);
+    auto list = dynamic_cast<AST::StatementList *>(as->trueBody);
+    REQUIRE(list != nullptr);
+    REQUIRE(list->statements.size() == 1);
+    auto flist = dynamic_cast<AST::StatementList *>(as->falseBody);
+    REQUIRE(flist != nullptr);
+    REQUIRE(flist->statements.size() == 3);
+  }
+
+  SECTION("parser can parse while statements") {
+    std::string source = R"(
+      while true
+        x <- 45
+      end
+    )";
+
+    Parser p(source);
+    auto as = dynamic_cast<AST::WhileLoop *>(p.parseStatement());
+
+    REQUIRE(as != nullptr);
+  }
+}
+
+TEST_CASE("parser can parse statement lists", "[parser]") {
+  SECTION("parser can parse empty statement lists") {
+    std::string source = "x";
+    Parser p(source);
+    auto x = p.parseVariable();
+    auto ss = p.parseStatementList();
+
+    REQUIRE(ss->statements.size() == 0);
+  }
+
+  SECTION("parse can parse several statements") {
+    std::string source = R"(
+      x <- 67
+      y <- 56
+    )";
+    Parser p(source);
+    auto ss = p.parseStatementList();
+
+    REQUIRE(ss->statements.size() == 2);
+  }
+}

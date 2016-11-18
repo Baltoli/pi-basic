@@ -2,11 +2,15 @@
 
 #include <string>
 #include <vector>
+#include <experimental/optional>
+#include <map>
 
 #include "ast.hh"
 
 using std::vector;
 using std::string;
+using std::map;
+using std::experimental::optional;
 
 struct Parser {
   vector<string> lines;
@@ -32,8 +36,17 @@ struct Parser {
   AST::Node *parseBooleanTerm();
   AST::Node *parseBoolean();
   AST::Assign *parseAssign();
+  AST::Node *parseStatement();
+  AST::If *parseIf();
+  AST::WhileLoop *parseWhileLoop();
+  AST::StatementList *parseStatementList();
 private:
   void skipWhitespace();
+  bool nextLine();
+  size_t keyword(string kw, bool eat = true);
+  template<typename T> optional<string> longestKeyword(map<string, T> kws);
+  template<typename T> T *wrap(string left, T *(Parser::*)(), string right);
+  template<typename T> T *matchLine(T *(Parser::* p)());
 
   static vector<string> splitLines(string source);
   static string &leftTrim(string &str);

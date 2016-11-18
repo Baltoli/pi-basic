@@ -23,6 +23,7 @@ Assign::Assign(std::string n, Node *v) : name(n), value(v) {}
 WhileLoop::WhileLoop(Node *c, Node *b) : condition(c), body(b) {}
 
 If::If(Node *c, Node *t, Node* f) : condition(c), trueBody(t), falseBody(f) {}
+If::If(Node *c, Node *t) : condition(c), trueBody(t), falseBody(nullptr) {}
 
 Call::Call(std::string n, std::vector<Node *> a) : name(n), args(a) {}
 

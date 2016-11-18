@@ -111,6 +111,7 @@ struct If : public Node {
   Node *trueBody;
   Node *falseBody;
 
+  If(Node *c, Node *t);
   If(Node *c, Node *t, Node *f);
 
   llvm::Value *compile(Compiler::State &s) override;

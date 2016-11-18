@@ -1,7 +1,36 @@
 #include <sstream>
 #include <iostream>
+#include <map>
 
 #include "parser.hh"
+
+using std::experimental::optional;
+
+#define OPTION(parser) \
+  do { \
+    auto ret = parse##parser(); \
+    if(ret) { \
+      return ret; \
+    } \
+  } while(false) 
+
+#define OPTION_MAP(f, parser) \
+  do { \
+    auto ret = f(parser); \
+    if(ret) { \
+      return ret; \
+    } \
+  } while(false)
+
+#define PARENS(parser) \
+  (wrap("(", &Parser::parse##parser, ")"))
+
+#define KEYWORD(kw, ret) \
+  do { \
+    if(keyword(kw)) { \
+      return ret; \
+    } \
+  } while(false);
 
 Parser::Parser(std::string source) {
   lines = splitLines(source);
@@ -47,13 +76,8 @@ AST::Literal *Parser::parseLiteral() {
 AST::BooleanLiteral *Parser::parseBooleanLiteral() {
   skipWhitespace();
 
-  if (isPrefix("true", column)) {
-    column += 4;
-    return new AST::BooleanLiteral(true);
-  } else if (isPrefix("false", column)) {
-    column += 5;
-    return new AST::BooleanLiteral(false);
-  }
+  KEYWORD("true", new AST::BooleanLiteral(true));
+  KEYWORD("false", new AST::BooleanLiteral(false));
 
   return nullptr;
 }
@@ -80,66 +104,35 @@ AST::Variable *Parser::parseVariable() {
 AST::BinaryOpType Parser::parseOperator() {
   skipWhitespace();
 
-  if(*(column + 1) == '=') {
-    switch (*column) {
-      case '!':
-        column += 2;
-        return AST::Neq;
-      case '>':
-        column += 2;
-        return AST::GtEq;
-      case '<':
-        column += 2;
-        return AST::LtEq;
-      default:
-        return AST::Invalid;
-    }
+  std::map<string, AST::BinaryOpType> ops = {
+    { "+", AST::Add },
+    { "-", AST::Subtract },
+    { "*", AST::Multiply },
+    { "/", AST::Divide },
+    { "%", AST::Mod },
+    { "!=", AST::Neq },
+    { "=", AST::Eq },
+    { ">=", AST::GtEq },
+    { "<=", AST::LtEq },
+    { ">", AST::Gt },
+    { "<", AST::Lt },
+    { "and", AST::And },
+    { "or", AST::Or }
+  };
+
+  optional<string> op = longestKeyword(ops);
+  if(op) {
+    keyword(*op);
+    return(ops[*op]);
   }
 
-  switch (*column) {
-    case '+':
-      column += 1;
-      return AST::Add;
-    case '-':
-      column += 1;
-      return AST::Subtract;
-    case '*':
-      column += 1;
-      return AST::Multiply;
-    case '/':
-      column += 1;
-      return AST::Divide;
-    case '%':
-      column += 1;
-      return AST::Mod;
-    case '=':
-      column += 1;
-      return AST::Eq;
-    case '>':
-      column += 1;
-      return AST::Gt;
-    case '<':
-      column += 1;
-      return AST::Lt;
-    default:
-      if(isPrefix("and", column)) {
-        column += 3;
-        return AST::And;
-      } else if(isPrefix("or", column)) {
-        column += 2;
-        return AST::Or;
-      }
-      return AST::Invalid;
-  }
+  return AST::Invalid;
 }
 
 AST::UnaryOpType Parser::parseUnaryOperator() {
   skipWhitespace();
 
-  if (isPrefix("not", column)) {
-    column += 3;
-    return AST::Not;
-  }
+  KEYWORD("not", AST::Not);
 
   return AST::UnaryInvalid;
 }
@@ -147,38 +140,11 @@ AST::UnaryOpType Parser::parseUnaryOperator() {
 AST::Node *Parser::parseFactor() {
   skipWhitespace();
 
-  auto maybeCall = parseCall();
-  if(maybeCall) {
-    return maybeCall;
-  }
-
-  auto maybeLiteral = parseLiteral();
-  if(maybeLiteral) {
-    return maybeLiteral;
-  }
-
-  auto maybeVariable = parseVariable();
-  if(maybeVariable) {
-    return maybeVariable;
-  }
-
-  auto prev = column;
-  if (*column == '(') {
-    column++;
-    skipWhitespace();
-    auto maybeExpr = parseExpression();
-    skipWhitespace();
-    if(*column == ')' && maybeExpr) {
-      return maybeExpr;
-    } else {
-      column = prev;
-    }
-  }
-
-  auto maybeDeref = parseDeref();
-  if(maybeDeref) {
-    return maybeDeref;
-  }
+  OPTION(Call);
+  OPTION(Literal);
+  OPTION(Variable);
+  OPTION_MAP(PARENS, Expression);
+  OPTION(Deref);
 
   return nullptr;
 }
@@ -224,29 +190,12 @@ AST::Node *Parser::parseExpression() {
 }
 
 AST::Deref *Parser::parseDeref() {
-  auto prev = column;
-  skipWhitespace();
-
-  if(*column != '[') {
-    return nullptr;
+  auto dr = wrap("[", &Parser::parseExpression, "]");
+  if(dr) {
+    return new AST::Deref(dr);
   }
 
-  column++;
-  auto expr = parseExpression();
-  if(!expr) {
-    column = prev;
-    return nullptr;
-  }
-
-  skipWhitespace();
-
-  if(*column != ']') {
-    column = prev;
-    return nullptr;
-  }
-
-  column++;
-  return new AST::Deref(expr);
+  return nullptr;
 }
 
 AST::Call *Parser::parseCall() {
@@ -323,28 +272,9 @@ AST::BinaryOp *Parser::parseComparison() {
 }
 
 AST::Node *Parser::parseBooleanFactor() {
-  auto maybeCompare = parseComparison();
-  if(maybeCompare) {
-    return maybeCompare;
-  }
-
-  auto maybeLiteral = parseBooleanLiteral();
-  if(maybeLiteral) {
-    return maybeLiteral;
-  }
-
-  auto prev = column;
-  if (*column == '(') {
-    column++;
-    skipWhitespace();
-    auto maybeExpr = parseBoolean();
-    skipWhitespace();
-    if(*column == ')' && maybeExpr) {
-      return maybeExpr;
-    } else {
-      column = prev;
-    }
-  }
+  OPTION(Comparison);
+  OPTION(BooleanLiteral);
+  OPTION_MAP(PARENS, Boolean);
 
   auto op = parseUnaryOperator();
   auto maybeBool = parseBoolean();
@@ -422,6 +352,138 @@ AST::Assign *Parser::parseAssign() {
 
   column = prev;
   return nullptr;
+}
+
+AST::Node *Parser::parseStatement() {
+  OPTION(Assign);
+  OPTION(If);
+  OPTION(WhileLoop);
+
+  return nullptr;
+}
+
+AST::If *Parser::parseIf() {
+  skipWhitespace();
+  auto prev = column;
+
+  if(keyword("if")) {
+    auto maybeB = parseBoolean();
+    if(nextLine() && maybeB) {
+      auto list = parseStatementList();
+      if(list && keyword("end")) {
+        return new AST::If(maybeB, list, nullptr);
+      } else if(list && keyword("else") && nextLine()) {
+        auto falseList = parseStatementList();
+        if(falseList && keyword("end")) {
+          return new AST::If(maybeB, list, falseList);
+        }
+      }
+    }
+  }
+
+  column = prev;
+  return nullptr;
+}
+
+AST::WhileLoop *Parser::parseWhileLoop() {
+  skipWhitespace();
+  auto prev = column;
+
+  if(keyword("while")) {
+    auto maybeB = parseBoolean();
+    if(nextLine() && maybeB) {
+      auto list = parseStatementList();
+      if(list && keyword("end")) {
+        return new AST::WhileLoop(maybeB, list);
+      }
+    }
+  }
+
+  column = prev;
+  return nullptr;
+}
+
+AST::StatementList *Parser::parseStatementList() {
+  vector<AST::Node *> results;
+  AST::Node *match;
+
+  while((match = matchLine(&Parser::parseStatement))) {
+    results.push_back(match);
+  }
+
+  return new AST::StatementList(results);
+}
+
+template<typename T>
+optional<string> Parser::longestKeyword(std::map<string, T> kws) {
+  size_t max = 0;
+  string maxVal;
+
+  for(const auto& kw : kws) {
+    size_t length = keyword(kw.first, false);
+    if(length > max) {
+      max = length;
+      maxVal = kw.first;
+    }
+  }
+
+  optional<string> empty {};
+  return max > 0 ? maxVal : empty;
+}
+
+size_t Parser::keyword(string kw, bool eat) {
+  skipWhitespace();
+  if(isPrefix(kw, column)) {
+    if(eat) { column += kw.length(); }
+
+    return kw.length();
+  }
+  return 0;
+}
+
+template<typename T> 
+T *Parser::wrap(string left, T *(Parser::* p)(), string right) {
+  auto prev = column;
+  skipWhitespace();
+
+  if(keyword(left)) {
+    skipWhitespace();
+    auto maybeT = (this->*p)();
+    skipWhitespace();
+    if(keyword(right) && maybeT) {
+      return maybeT;
+    }
+  }
+
+  column = prev;
+  return nullptr;
+}
+
+template<typename T>
+T *Parser::matchLine(T *(Parser::* p)()) {
+  auto prev = column;
+  skipWhitespace();
+
+  T *maybeT;
+  if((maybeT = (this->*p)())) {
+    if(column == line->end()) {
+      nextLine();
+      return maybeT;
+    }
+  }
+
+  column = prev;
+  return nullptr;
+}
+
+bool Parser::nextLine() {
+  if(line != lines.end() - 1) {
+    line++;
+    column = line->begin();
+    return true;
+  }
+
+  return false;
 }
 
 void Parser::skipWhitespace() {
