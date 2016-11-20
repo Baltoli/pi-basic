@@ -43,6 +43,7 @@ struct Parser {
   AST::StatementList *parseStatementList();
   AST::FunctionDecl *parseFunctionDeclaration();
   AST::FunctionList *parseFunctionList();
+  AST::Program *parseProgram();
 private:
   void skipWhitespace();
   bool nextLine();
@@ -50,6 +51,7 @@ private:
   template<typename T> optional<string> longestKeyword(map<string, T> kws);
   template<typename T> T *wrap(string left, T *(Parser::*)(), string right);
   template<typename T> T *matchLine(T *(Parser::* p)());
+  void skipLines();
 
   static vector<string> splitLines(string source);
   static string &leftTrim(string &str);

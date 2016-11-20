@@ -220,6 +220,7 @@ AST::Call *Parser::parseCall() {
     return nullptr;
   }
 
+  column++;
   return new AST::Call(maybeV->name, exprs);
 }
 
@@ -470,10 +471,18 @@ AST::FunctionList *Parser::parseFunctionList() {
 
   while((match = parseFunctionDeclaration())) {
     nextLine();
+    skipLines();
     results.push_back(match);
   }
 
   return new AST::FunctionList(results);
+}
+
+AST::Program *Parser::parseProgram() {
+  auto functions = parseFunctionList();
+  auto statements = parseStatementList();
+
+  return new AST::Program(functions, statements);
 }
 
 template<typename T>
@@ -587,4 +596,10 @@ bool Parser::nonEmpty(char ch) {
 
 bool Parser::isPrefix(string pre, string::iterator source) {
   return std::equal(pre.begin(), pre.end(), source);
+}
+
+void Parser::skipLines() {
+  while(line->begin() == line->end()) {
+    nextLine();
+  }
 }

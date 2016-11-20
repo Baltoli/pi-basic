@@ -744,3 +744,30 @@ TEST_CASE("parser can parse function lists", "[parser]") {
     REQUIRE(f->functions.size() == 2);
   }
 }
+
+TEST_CASE("parser can parse programs", "[program]") {
+  SECTION("parser can parse a full program") {
+    std::string source = R"(
+      function x(y, z)
+        x <- 34
+        z <- x
+      end
+
+      function d(a, c)
+        z <- c
+      end
+
+      y <- [d(3, 4, 5)]
+      x <- 4 * y
+      z <- 23 + [x * y]
+    )";
+    Parser p(source);
+    auto prog = p.parseProgram();
+
+    REQUIRE(prog != nullptr);
+    auto funcs = dynamic_cast<AST::FunctionList *>(prog->functions);
+    auto stmts = dynamic_cast<AST::StatementList *>(prog->body);
+    REQUIRE(funcs->functions.size() == 2);
+    REQUIRE(stmts->statements.size() == 3);
+  }
+}
