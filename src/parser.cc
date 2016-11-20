@@ -487,6 +487,7 @@ AST::FunctionList *Parser::parseFunctionList() {
 AST::Program *Parser::parseProgram() {
   auto functions = parseFunctionList();
   auto statements = parseStatementList();
+  line++;
 
   if(line != lines.end()) {
     error("Failed to parse whole file");
