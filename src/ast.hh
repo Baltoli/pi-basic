@@ -39,7 +39,7 @@ struct Variable : public Node {
   llvm::Value *compile(Compiler::State &s) override;
 };
 
-enum OpType {
+enum BinaryOpType {
   Add,
   Subtract,
   Multiply,
@@ -50,15 +50,32 @@ enum OpType {
   Gt,
   Lt,
   GtEq,
-  LtEq
+  LtEq,
+  And,
+  Or,
+  Invalid
+};
+
+enum UnaryOpType {
+  Not,
+  UnaryInvalid
 };
 
 struct BinaryOp : public Node {
   Node *left;
   Node *right;
-  OpType type;
+  BinaryOpType type;
 
-  BinaryOp(Node *l, OpType t, Node *r);
+  BinaryOp(Node *l, BinaryOpType t, Node *r);
+
+  llvm::Value *compile(Compiler::State &s) override;
+};
+
+struct UnaryOp : public Node {
+  Node *operand;
+  UnaryOpType type;
+
+  UnaryOp(UnaryOpType t, Node *op);
 
   llvm::Value *compile(Compiler::State &s) override;
 };
@@ -94,6 +111,7 @@ struct If : public Node {
   Node *trueBody;
   Node *falseBody;
 
+  If(Node *c, Node *t);
   If(Node *c, Node *t, Node *f);
 
   llvm::Value *compile(Compiler::State &s) override;

@@ -82,19 +82,28 @@ single integer to the console.
       | term '+' term
       | term '-' term
 
-    bool ::=
-        true
-      | false
+    comp ::=
       | expr '=' expr
       | expr '/=' expr
       | expr '>' expr
       | expr '<' expr
       | expr '>=' expr
       | expr '<=' expr
-      | bool 'and' bool
-      | bool 'or' bool
-      | 'not' bool
+
+    boolf ::=
+        true
+      | false
+      | comp
       | '(' bool ')'
+      | 'not' bool
+
+    boolt ::=
+      | boolf
+      | boolf 'and' boolf
+
+    bool ::=
+      | boolt
+      | boolt 'or' boolt
 
     statement ::=
         variable '<-' expr

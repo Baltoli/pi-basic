@@ -10,8 +10,11 @@ BooleanLiteral::BooleanLiteral(bool v) : value(v) {}
 
 Variable::Variable(std::string n) : name(n) {}
 
-BinaryOp::BinaryOp(Node *l, OpType t, Node *r) :
+BinaryOp::BinaryOp(Node *l, BinaryOpType t, Node *r) :
   left(l), type(t), right(r) {}
+
+UnaryOp::UnaryOp(UnaryOpType t, Node *op) :
+  type(t), operand(op) {}
 
 Deref::Deref(Node *a) : address(a) {}
 
@@ -20,6 +23,7 @@ Assign::Assign(std::string n, Node *v) : name(n), value(v) {}
 WhileLoop::WhileLoop(Node *c, Node *b) : condition(c), body(b) {}
 
 If::If(Node *c, Node *t, Node* f) : condition(c), trueBody(t), falseBody(f) {}
+If::If(Node *c, Node *t) : condition(c), trueBody(t), falseBody(nullptr) {}
 
 Call::Call(std::string n, std::vector<Node *> a) : name(n), args(a) {}
 
