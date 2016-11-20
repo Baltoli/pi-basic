@@ -4,8 +4,8 @@ add_test(
 )
 
 
-file(GLOB TESTS "${CMAKE_SOURCE_DIR}/examples/*.pb")
-foreach(TEST ${TESTS}) 
+file(GLOB PARSE_TESTS "${CMAKE_SOURCE_DIR}/examples/parse/*.pb")
+foreach(TEST ${PARSE_TESTS}) 
   get_filename_component(TEST_NAME ${TEST} NAME_WE)
   add_test(
     NAME "parse-${TEST_NAME}"
