@@ -21,10 +21,11 @@ struct Arg : public option::Arg {
   }
 };
 
-enum OptionIndex { UNKNOWN, FILE_NAME, HELP };
+enum OptionIndex { UNKNOWN, PARSE, FILE_NAME, HELP };
 const option::Descriptor usage[] = {
   { UNKNOWN, 0, "", "", option::Arg::None, "USAGE: pbc files [options]"
                                             "\n\nOptions:"},
+  { PARSE, 0, "", "parse", option::Arg::None, "  --parse: Only parse the file" },
   { HELP, 0, "h", "help", option::Arg::None, "  --help: Display this message" },
   { 0, 0, 0, 0, 0, 0 }
 };
@@ -64,8 +65,10 @@ int main(int argc, char *argv[]) {
       Parser p(source);
       AST::Program *ast = p.parseProgram();
       if(ast != nullptr) {
-        std::cout << "Successful parse" << std::endl;
-        return 0;
+        if(options[PARSE]) {
+          std::cout << "Successful parse" << std::endl;
+          return 0;
+        }
       } else {
         std::cout << "Syntax error" << std::endl;
         return 1;
