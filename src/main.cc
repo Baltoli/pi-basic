@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include "optionparser.h"
 
 #include "ast.hh"
@@ -55,8 +56,23 @@ int main(int argc, char *argv[]) {
   }
 
   for(int i = 0; i < parse.nonOptionsCount(); ++i) {
-    std::string fname;
-    std::cout << parse.nonOption(i) << std::endl;
+    std::string fname = parse.nonOption(i);
+    std::ifstream input(fname);
+    if(input) {
+      std::string source( (std::istreambuf_iterator<char>(input)),
+                          (std::istreambuf_iterator<char>() ));
+      Parser p(source);
+      AST::Program *ast = p.parseProgram();
+      if(ast != nullptr) {
+        std::cout << "Successful parse" << std::endl;
+        return 0;
+      } else {
+        std::cout << "Syntax error" << std::endl;
+        return 1;
+      }
+    } else {
+      std::cout << "The file " << fname << " could not be read" << std::endl;
+    }
   }
 
   return 0;

@@ -16,6 +16,7 @@ struct Parser {
   vector<string> lines;
   vector<string>::iterator line;
   string::iterator column;
+  vector<string> errors;
 
   Parser(string source);
 
@@ -52,6 +53,7 @@ private:
   template<typename T> T *wrap(string left, T *(Parser::*)(), string right);
   template<typename T> T *matchLine(T *(Parser::* p)());
   void skipLines();
+  void error(string);
 
   static vector<string> splitLines(string source);
   static string &leftTrim(string &str);
