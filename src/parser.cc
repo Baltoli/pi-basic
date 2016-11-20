@@ -34,6 +34,7 @@ using std::experimental::optional;
 
 Parser::Parser(std::string source) {
   lines = splitLines(source);
+  errors = {};
   if(lines.size() > 0) {
     line = lines.begin();
     column = line->begin();
@@ -486,6 +487,15 @@ AST::FunctionList *Parser::parseFunctionList() {
 AST::Program *Parser::parseProgram() {
   auto functions = parseFunctionList();
   auto statements = parseStatementList();
+  line++;
+
+  if(line != lines.end()) {
+    error("Failed to parse whole file");
+  }
+
+  if(errors.size() > 0) {
+    return nullptr;
+  }
 
   return new AST::Program(functions, statements);
 }
@@ -566,6 +576,10 @@ void Parser::skipWhitespace() {
   while(!nonEmpty(*column)) {
     column++;
   }
+}
+
+void Parser::error(string e) {
+  errors.push_back(e);
 }
 
 vector<string> Parser::splitLines(string source) {
