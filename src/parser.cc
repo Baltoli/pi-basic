@@ -358,8 +358,13 @@ AST::Assign *Parser::parseAssign() {
   auto prev = column;
   skipWhitespace();
 
-  auto maybeVar = parseVariable();
-  if(maybeVar == nullptr) {
+  AST::Node *loc = parseVariable();
+  if(loc == nullptr) {
+    column = prev;
+    loc = parseDeref();
+  }
+
+  if(loc == nullptr) {
     column = prev;
     return nullptr;
   }
@@ -376,7 +381,7 @@ AST::Assign *Parser::parseAssign() {
 
   auto maybeExpr = parseExpression();
   if(maybeExpr) {
-    return new AST::Assign(maybeVar->name, maybeExpr);
+    return new AST::Assign(loc, maybeExpr);
   }
 
   column = prev;

@@ -18,7 +18,7 @@ UnaryOp::UnaryOp(UnaryOpType t, Node *op) :
 
 Deref::Deref(Node *a) : address(a) {}
 
-Assign::Assign(std::string n, Node *v) : name(n), value(v) {}
+Assign::Assign(Node *l, Node *v) : location(l), value(v) {}
 
 WhileLoop::WhileLoop(Node *c, Node *b) : condition(c), body(b) {}
 
