@@ -89,10 +89,10 @@ struct Deref : public Node {
 };
 
 struct Assign : public Node {
-  std::string name;
+  Node *location;
   Node *value;
 
-  Assign(std::string n, Node *v);
+  Assign(Node *l, Node *v);
 
   llvm::Value *compile(Compiler::State &s) override;
 };

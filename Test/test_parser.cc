@@ -601,10 +601,27 @@ TEST_CASE("parser can parse assignment", "[parser]") {
     auto as = p.parseAssign();
 
     REQUIRE(as != nullptr);
-    REQUIRE(as->name == "x");
+    auto loc = dynamic_cast<AST::Variable *>(as->location);
+    REQUIRE(loc->name == "x");
     auto value = dynamic_cast<AST::Literal *>(as->value);
     REQUIRE(value != nullptr);
     REQUIRE(value->value == 34);
+  }
+
+  SECTION("parser can parse dereference assignments") {
+    std::string source = "[56] <- 4";
+    Parser p(source);
+    auto as = p.parseAssign();
+
+    REQUIRE(as != nullptr);
+    auto loc = dynamic_cast<AST::Deref *>(as->location);
+    REQUIRE(loc != nullptr);
+    auto addr = dynamic_cast<AST::Literal *>(loc->address);
+    REQUIRE(addr != nullptr);
+    REQUIRE(addr->value == 56);
+    auto value = dynamic_cast<AST::Literal *>(as->value);
+    REQUIRE(value != nullptr);
+    REQUIRE(value->value == 4);
   }
 }
 
@@ -615,7 +632,8 @@ TEST_CASE("parser can parse statements", "[parser]") {
     auto as = dynamic_cast<AST::Assign *>(p.parseStatement());
 
     REQUIRE(as != nullptr);
-    REQUIRE(as->name == "ys");
+    auto loc = dynamic_cast<AST::Variable *>(as->location);
+    REQUIRE(loc->name == "ys");
     auto val = dynamic_cast<AST::Literal *>(as->value);
     REQUIRE(val->value == 67);
   }
