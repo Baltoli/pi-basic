@@ -695,3 +695,52 @@ TEST_CASE("parser can parse statement lists", "[parser]") {
     REQUIRE(ss->statements.size() == 2);
   }
 }
+
+TEST_CASE("parser can parse argument lists", "[parser]") {
+  SECTION("parser can parse some argument list") {
+    std::string source = "a, bb, ccc";
+    Parser p(source);
+    auto al = p.parseArgumentList();
+
+    REQUIRE(al.size() == 3);
+  }
+}
+
+TEST_CASE("parser can parse function declarations", "[parser]") {
+  SECTION("parser can parse function") {
+    std::string source = R"(
+      function fun(x, y, z)
+        x <- 45
+        y <- 78
+      end
+    )";
+    Parser p(source);
+    auto f = p.parseFunctionDeclaration();
+
+    REQUIRE(f != nullptr);
+    REQUIRE(f->name == "fun");
+    REQUIRE(f->params.size() == 3);
+    auto body = dynamic_cast<AST::StatementList *>(f->body);
+    REQUIRE(body != nullptr);
+    REQUIRE(body->statements.size() == 2);
+  }
+}
+
+TEST_CASE("parser can parse function lists", "[parser]") {
+  SECTION("parser parses the list correctly") {
+    std::string source = R"(
+      function fun(x, y, z)
+        x <- 45
+        y <- 78
+      end
+      function g(w)
+        x <- 432
+      end
+    )";
+    Parser p(source);
+    auto f = p.parseFunctionList();
+
+    REQUIRE(f != nullptr);
+    REQUIRE(f->functions.size() == 2);
+  }
+}

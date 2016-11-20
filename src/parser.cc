@@ -251,6 +251,34 @@ vector<AST::Node *> Parser::parseExpressionList() {
   return vec;
 }
 
+vector<string> Parser::parseArgumentList() {
+  vector<string> vec;
+  AST::Variable *expr;
+
+  bool comma = false;
+  while(true) {
+    expr = parseVariable();
+    if(expr != nullptr) {
+      vec.push_back(expr->name);
+    } else if(comma) {
+      column--;
+      break;
+    }
+
+    comma = false;
+    skipWhitespace();
+
+    if(*column == ',') {
+      comma = true;
+      column++;
+    } else {
+      break;
+    }
+  }
+
+  return vec;
+}
+
 AST::BinaryOp *Parser::parseComparison() {
   auto prev = column;
 
@@ -412,6 +440,40 @@ AST::StatementList *Parser::parseStatementList() {
   }
 
   return new AST::StatementList(results);
+}
+
+AST::FunctionDecl *Parser::parseFunctionDeclaration() {
+  auto prev = column;
+  skipWhitespace();
+
+  if(keyword("function ")) {
+    skipWhitespace();
+    auto maybeV = parseVariable();
+    if(maybeV && keyword("(")) {
+      auto list = parseArgumentList();
+      if(keyword(")") && nextLine()) {
+        auto stmts = parseStatementList();
+        if(stmts && keyword("end")) {
+          return new AST::FunctionDecl(maybeV->name, list, stmts);
+        }
+      }
+    }
+  }
+
+  column = prev;
+  return nullptr;
+}
+
+AST::FunctionList *Parser::parseFunctionList() {
+  vector<AST::Node *> results;
+  AST::Node *match;
+
+  while((match = parseFunctionDeclaration())) {
+    nextLine();
+    results.push_back(match);
+  }
+
+  return new AST::FunctionList(results);
 }
 
 template<typename T>

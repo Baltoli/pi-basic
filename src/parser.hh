@@ -30,6 +30,7 @@ struct Parser {
   AST::Deref *parseDeref();
   AST::Call *parseCall();
   vector<AST::Node *> parseExpressionList();
+  vector<string> parseArgumentList();
   AST::BinaryOp *parseComparison();
   AST::UnaryOpType parseUnaryOperator();
   AST::Node *parseBooleanFactor();
@@ -40,6 +41,8 @@ struct Parser {
   AST::If *parseIf();
   AST::WhileLoop *parseWhileLoop();
   AST::StatementList *parseStatementList();
+  AST::FunctionDecl *parseFunctionDeclaration();
+  AST::FunctionList *parseFunctionList();
 private:
   void skipWhitespace();
   bool nextLine();
