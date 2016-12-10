@@ -32,7 +32,7 @@ add_executable(unit_tests
   test/test_parser.cc
 )
 
-set(CMAKE_CXX_FLAGS "-std=c++1z")
+set(CMAKE_CXX_FLAGS "-std=c++1z -fvisibility=hidden")
 
 # Find the libraries that correspond to the LLVM components
 # that we wish to use

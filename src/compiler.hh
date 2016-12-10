@@ -3,6 +3,8 @@
 
 #include <llvm/IR/LLVMContext.h>
 #include <llvm/IR/IRBuilder.h>
+#include <llvm/IR/Module.h>
+#include <llvm/IR/Function.h>
 
 using namespace llvm;
 
@@ -12,6 +14,9 @@ struct State {
   LLVMContext C;
   std::unique_ptr<Module> Mod;
   IRBuilder<> B;
+  std::vector<Function> Funcs;
+
+  State();
 };
 
 }

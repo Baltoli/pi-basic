@@ -5,6 +5,9 @@ using namespace llvm;
 using namespace AST;
 using namespace Compiler;
 
+State::State() : B(C) {
+}
+
 Value *Literal::compile(State &s) {
   return nullptr;
 }
