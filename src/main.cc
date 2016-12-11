@@ -4,6 +4,9 @@
 
 #include "ast.hh"
 #include "parser.hh"
+#include "compiler.hh"
+
+using Compiler::State;
 
 struct Arg : public option::Arg {
   static void printError(const char* msg1, const option::Option& opt, const char* msg2) {
@@ -69,6 +72,9 @@ int main(int argc, char *argv[]) {
           std::cout << "Successful parse" << std::endl;
           return 0;
         }
+
+        State s;
+        ast->compile(s);
       } else {
         std::cout << "Syntax error" << std::endl;
         return 1;
