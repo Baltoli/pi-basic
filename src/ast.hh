@@ -126,6 +126,14 @@ struct Call : public Node {
   llvm::Value *compile(Compiler::State &s) override;
 };
 
+struct Return : public Node {
+  Node *value;
+
+  Return(Node *v);
+
+  llvm::Value *compile(Compiler::State &s) override;
+};
+
 struct FunctionDecl : public Node {
   std::string name;
   std::vector<std::string> params;

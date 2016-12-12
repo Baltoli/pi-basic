@@ -27,6 +27,8 @@ If::If(Node *c, Node *t) : condition(c), trueBody(t), falseBody(nullptr) {}
 
 Call::Call(std::string n, std::vector<Node *> a) : name(n), args(a) {}
 
+Return::Return(Node *v) : value(v) {}
+
 FunctionDecl::FunctionDecl(std::string n, std::vector<std::string> p, Node *b) :
   name(n), params(p), body(b) {}
 

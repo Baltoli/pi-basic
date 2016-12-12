@@ -191,6 +191,10 @@ Value *FunctionDecl::compile(State &s) {
   return s.B.CreateRetVoid();
 }
 
+Value *Return::compile(State &s) {
+  return nullptr;
+}
+
 Value *FunctionList::compile(State &s) {
   for(auto func : functions) {
     func->compile(s);
@@ -199,9 +203,7 @@ Value *FunctionList::compile(State &s) {
   return nullptr;
 }
 
-#include <iostream>
 Value *StatementList::compile(State &s) {
-  std::cout << statements.size() << '\n';
   Value *last = nullptr;
   for(auto stmt : statements) {
     last = stmt->compile(s);
