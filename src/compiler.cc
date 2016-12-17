@@ -188,11 +188,16 @@ Value *FunctionDecl::compile(State &s) {
   Value *last = body->compile(s);
 
   s.popContext();
+  
+  if(isa<ReturnInst>(last)) {
+    return last;
+  }
+
   return s.B.CreateRetVoid();
 }
 
 Value *Return::compile(State &s) {
-  return nullptr;
+  return s.B.CreateRet(value->compile(s));
 }
 
 Value *FunctionList::compile(State &s) {
