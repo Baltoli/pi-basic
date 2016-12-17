@@ -3,5 +3,14 @@ function inc(addr)
   return [addr]
 end
 
-x <- inc(0)
-x <- inc(0)
+function incfive(addr)
+  x <- inc(addr)
+  x <- inc(addr)
+  x <- inc(addr)
+  x <- inc(addr)
+  x <- inc(addr)
+  return [addr]
+end
+
+[0] <- 10
+x <- incfive(0)

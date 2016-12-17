@@ -235,6 +235,13 @@ Value *Program::compile(State &s) {
   s.B.SetInsertPoint(main);
   body->compile(s);
 
+  Value *addr = ConstantInt::get(s.intTy, 0);
+  Type *ptrTy = PointerType::getUnqual(s.intTy);
+  Value *ptr = s.B.CreateBitCast(s.memory, ptrTy);
+  Value *offset = s.B.CreateGEP(ptr, addr);
+  Value *loaded = s.B.CreateLoad(offset);
+  s.B.CreateRet(loaded);
+
   s.Mod->dump();
   return nullptr;
 }
