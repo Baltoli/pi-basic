@@ -690,6 +690,14 @@ TEST_CASE("parser can parse statements", "[parser]") {
 
     REQUIRE(as != nullptr);
   }
+
+  SECTION("parser can parse return statements") {
+    std::string source = "return 4";
+    Parser p(source);
+    auto ret = dynamic_cast<AST::Return *>(p.parseStatement());
+
+    REQUIRE(ret != nullptr);
+  }
 }
 
 TEST_CASE("parser can parse statement lists", "[parser]") {
