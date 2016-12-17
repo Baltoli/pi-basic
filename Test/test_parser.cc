@@ -789,3 +789,15 @@ TEST_CASE("parser can parse programs", "[program]") {
     REQUIRE(stmts->statements.size() == 3);
   }
 }
+
+TEST_CASE("parser can parse returns", "[parser]") {
+  SECTION("parser can parse a return statement") {
+    std::string source = "return 3";
+    Parser p(source);
+    AST::Return *ret = p.parseReturn();
+
+    REQUIRE(ret != nullptr);
+    auto expr = dynamic_cast<AST::Literal *>(ret->value);
+    REQUIRE(expr->value == 3);
+  }
+}

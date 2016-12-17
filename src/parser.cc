@@ -393,6 +393,7 @@ AST::Node *Parser::parseStatement() {
   OPTION(Assign);
   OPTION(If);
   OPTION(WhileLoop);
+  OPTION(Return);
 
   return nullptr;
 }
@@ -498,6 +499,17 @@ AST::Program *Parser::parseProgram() {
   }
 
   return new AST::Program(functions, statements);
+}
+
+AST::Return *Parser::parseReturn() {
+  if(keyword("return")) {
+    skipWhitespace();
+    auto expr = parseExpression();
+
+    return new AST::Return(expr);
+  }
+
+  return nullptr;
 }
 
 template<typename T>

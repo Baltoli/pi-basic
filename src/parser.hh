@@ -45,6 +45,7 @@ struct Parser {
   AST::FunctionDecl *parseFunctionDeclaration();
   AST::FunctionList *parseFunctionList();
   AST::Program *parseProgram();
+  AST::Return *parseReturn();
 private:
   void skipWhitespace();
   bool nextLine();
